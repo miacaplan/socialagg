@@ -11,6 +11,7 @@ with open('TOKEN.txt') as rin:
 # FOLLOWING = ['HillaryClinton', 'DonaldTrump', 'BernieSanders']
 
 def get_page_info(name):
+    print(name)
     graph = facebook.GraphAPI(access_token=TOKEN,version='2.5')
     client = pymongo.MongoClient()
     db = client.get_database('socialagg')
@@ -19,9 +20,11 @@ def get_page_info(name):
     pc = pages.find({'username':name})
     if pc and pc.count() > 0:
         return pc[0]
+    print('here')
 
 
     o = graph.get_object(name, fields="id,about,name,website,username,fan_count")
+    pprint('o:{0}'.format(o))
     pages.update({'id':o['id']}, {k:v for k,v in o.items()}, upsert=True)
     return pages.find({'username':name})[0]
 
