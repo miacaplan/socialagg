@@ -4,25 +4,27 @@ import pymongo
 import sys
 import os
 import models
+import connect
 
-with open('TOKEN.txt') as rin:
-    TOKEN = rin.read()
+# running_dir = os.path.dirname(__file__)
+# with open(os.path.join(running_dir, 'TOKEN.txt')) as rin:
+#     TOKEN = rin.read()
+
 
 # FOLLOWING = ['HillaryClinton', 'DonaldTrump', 'BernieSanders']
 
 def get_page_info(name):
     print(name)
-    graph = facebook.GraphAPI(access_token=TOKEN,version='2.5')
     # print("graph obj", graph.get_object())
-    pc = models.pages_collection.find({'username':name})
+    pc = models.pages_collection.find({'username': name})
     if pc and pc.count() > 0:
         return pc[0]
 
-
-    o = graph.get_object(name, fields="id,about,name,website,username,likes")
+    o = connect.graph.get_object(name, fields="id,about,name,website,username,likes")
+    o['website'] = o['website'].split()[0] #TODO insert the list of websites and show a list of thrm
     pprint('o:{0}'.format(o))
-    models.pages_collection.update({'id':o['id']}, {k:v for k,v in o.items()}, upsert=True)
-    return models.pages_collection.find({'username':name})[0]
+    models.pages_collection.update({'id': o['id']}, {k: v for k, v in o.items()}, upsert=True)
+    return models.pages_collection.find({'username': name})[0]
 
 
 if __name__ == '__main__':

@@ -1,3 +1,4 @@
+import facebook
 import requests
 
 # import facebook
@@ -37,6 +38,5 @@ assert key == "access_token"
 with open("TOKEN.txt", "w") as f:
     f.write(value)
 
-print("OK")
-
-
+graph = facebook.GraphAPI(access_token=value, version='2.5')
+print("Connected to FB graph API")
