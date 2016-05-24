@@ -19,7 +19,7 @@ def get_page_info(name):
         return pc[0]
 
 
-    o = graph.get_object(name, fields="id,about,name,website,username,fan_count")
+    o = graph.get_object(name, fields="id,about,name,website,username,likes")
     pprint('o:{0}'.format(o))
     models.pages_collection.update({'id':o['id']}, {k:v for k,v in o.items()}, upsert=True)
     return models.pages_collection.find({'username':name})[0]
@@ -32,11 +32,11 @@ if __name__ == '__main__':
         exit(1)
 
     new_name = os.path.basename(sys.argv[1].strip('/')).strip()
-    try:
-        added = get_page_info(new_name)
-        pprint("OK, added id #{} with {} fans.".format(added['id'], added['fan_count']))
-    except facebook.GraphAPIError:
-        print("Not a page")
+    # try:
+    added = get_page_info(new_name)
+    pprint("OK, added id #{} with {} fans.".format(added['id'], added['likes']))
+    # except facebook.GraphAPIError:
+    #     print("Not a page")
 
 
 
