@@ -5,6 +5,9 @@ client = pymongo.MongoClient()
 db = client.get_database('socialagg')
 pages_collection = db.get_collection('pages')
 posts_collection = db.get_collection('posts')
+pages_collection.create_index('id', unique=True)
+posts_collection.create_index('id', unique=True)
+
 
 def upsert(coll, data):
     num_updated = 0

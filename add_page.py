@@ -1,16 +1,50 @@
-@route('/<id>')
-def index(id):
-    with open('item_template.html') as tempin:
-        page_str = tempin.read()
+from pprint import pprint
+import facebook
+import pymongo
+import sys
+import os
+import models
 
-    for p in pages.find({'id':id}):
-        page_str  = page_str.format(**p)
-        # pprint(p)
-        break
-        # candidates_str+=CANDIDATE_LIST_ITEM.format(**p)
+with open('TOKEN.txt') as rin:
+    TOKEN = rin.read()
 
-    # pprint(candidates_str)
-    # with open("index_template.html") as index:
-    #     candidates_template=index.read().format(candidates_str)
+# FOLLOWING = ['HillaryClinton', 'DonaldTrump', 'BernieSanders']
 
-    return template(page_str)  #template(candidates_template)
+def get_page_info(name):
+    print(name)
+    graph = facebook.GraphAPI(access_token=TOKEN,version='2.5')
+    # print("graph obj", graph.get_object())
+    pc = models.pages_collection.find({'username':name})
+    if pc and pc.count() > 0:
+        return pc[0]
+
+
+    o = graph.get_object(name, fields="id,about,name,website,username,fan_count")
+    pprint('o:{0}'.format(o))
+    models.pages_collection.update({'id':o['id']}, {k:v for k,v in o.items()}, upsert=True)
+    return models.pages_collection.find({'username':name})[0]
+
+
+if __name__ == '__main__':
+    USAGE = 'USAGE: {} page_url'.format(os.path.basename(sys.argv[0]))
+    if len(sys.argv) != 2:
+        pprint(USAGE)
+        exit(1)
+
+    new_name = os.path.basename(sys.argv[1].strip('/')).strip()
+    try:
+        added = get_page_info(new_name)
+        pprint("OK, added id #{} with {} fans.".format(added['id'], added['fan_count']))
+    except facebook.GraphAPIError:
+        print("Not a page")
+
+
+
+# db.create_collection('pages')
+# pages.drop()
+# for p in pages.find():
+#     pprint(p)
+
+# URL = "https://graph.facebook.com/oauth/access_token"
+
+# graph = facebook.GraphAPI(access_token=TOKEN, varsion='2.5')
