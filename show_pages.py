@@ -42,14 +42,16 @@ def latest():
         {'page_id': '124955570892789', '_id': ObjectId('57441554d15af3b63cef877b'), 'status_type': 'shared_story', 'likes': 3061,
          'created_time': '2016-05-24T04:55:01+0000', 'shares': 415, 'id': '124955570892789_1053722661349404'}
         """
-        posts_list_page += "<li>message: {message} likes: {likes}</li>\n".format(**p)
+        posts_list_page += "<li>message: {message} likes: {likes} from {from_name}</li>\n".format(**p,
+                                                                                                  from_name=p['from'][
+                                                                                                      'name'])
 
     posts_list_page += "</ul>"
 
     return posts_list_page
 
 
-@route('/pages/<id>')
+@route('/<id>')
 def index(id):
     with open('templates/item_template.html') as tempin:
         page_str = tempin.read()
